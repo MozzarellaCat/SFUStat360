@@ -1,6 +1,8 @@
 ---
 title: "Stat 360 Week 1 exercises"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -9,19 +11,32 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 1. On which line does a get copied in the following example?
+-> On line 3
 ```{r}
+library(lobstr)
 a <- c(1, 5, 3, 2)
 b <- a
+# c(obj_addr(a),obj_addr(b))
 b[[1]] <- 10
+# c(obj_addr(a),obj_addr(b))
 ```
 
 2. In the following code chunk, does `x` get copied? Does `ll` get copied? Does  `ee` get copied?
+-> only ll get copied
 ```{r}
 x <- rnorm(100); y <- rnorm(100)
+#c(obj_addr(x),obj_addr(y))
+cat(tracemem(x), "\n")
+cat(tracemem(y), "\n")
 ll <- list(x=x,y=y)
+cat(tracemem(ll), "\n")
+#c(obj_addr(ll))
 ll$x <- 1:100
 ee <- rlang::env(x=x,y=y)
+#cat(tracemem(ee), "\n")
+#c(obj_addr(ee))
 ee$x <- 1:100
+#c(obj_addr(x),obj_addr(y),obj_addr(ll),obj_addr(ee))
 ```
 
 3. Find the size of the objects x and y in the following code chunk.
