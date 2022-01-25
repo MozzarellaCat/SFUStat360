@@ -42,8 +42,17 @@ ee$x <- 1:100
 3. Find the size of the objects x and y in the following code chunk.
 Which is smaller? If instead of vectors from 1 to 10 they were vectors
 from 1 to 1 million, which would be smaller?
-
+->x is smaller
+-> if to 1 million, y is smaller
 ```{r}
-x <- c(1,2,3,4,5,6,7,8,9,10)
+#x <- c(1,2,3,4,5,6,7,8,9,10)
+x <- c(1:10)
+print(x)
+obj_size(x)
 y <- 1:10
+obj_size(y)
+x1 <- c(1:1000000)
+obj_size(x1)
+y1 <- 1:1000000
+obj_size(y1)
 ```
