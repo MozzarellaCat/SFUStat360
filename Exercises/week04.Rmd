@@ -1,7 +1,9 @@
 ---
 title: "Week 4 exercises"
 author: "Brad McNeney"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -14,9 +16,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 f <- function() {
-  fe <- environment(f)
-  ee <- environment()
-  pe <- parent.env(ee)
+  fe <- environment(f) #environment of f
+  ee <- environment() # Returns ID of environment w/in f
+  pe <- parent.env(ee) #enclosing environment of ee 
   list(fe=fe,ee=ee,pe=pe)
 }
 f()
@@ -37,8 +39,11 @@ f <- function(xx) {
 }
 f(2)
 xx <- 1
+xx <- 3
+xx <- 5
 f(2)
 rm(xx)
+#look for object of name xx, return the value of object found in enclosing environment of f (global)
 ```
 
 3. Write a function with argument `xx` that tests 
@@ -48,10 +53,33 @@ whether `xx` exists in the parent environment and, if so,
     (b) tests whether `xx` and `xx_parent` are equal. If 
     the test is FALSE, throw a warning to alert the user to
     the fact that the two are not equal.
+    
+```{r}
+f <- function(xx) {
+  if(exists(xx,envir=environment(f))) {
+    xx_parent <- get("xx",environment(f))
+    if(!(xx==xx_parent)){
+      warning("xx and xx_parent are not equal")
+    }
+  }
+}
+
+xx <- 2
+f("xx")
+```
 
 4. Write an infix version of `c()` that concatenates
 two vectors.
-
+```{r}
+`+` <- function(v1,v2){
+  append(v1,v2)
+}
+v1 <- c(1,2,3,4)
+v2 <- c(5,6,7,8)
+v <- v1+v2
+# v <- f4(v1,v2)
+is.vector(v)
+```
 ## Map-Reduce
 
 Refer to the Wikipedia page on algorithms for computing sample variances
@@ -74,22 +102,44 @@ simple_reduce <- function(x, f) { # Text section 9.5
   }
   out
 }
+
 allres <- simple_reduce(sumdat,rbind)
 my_mean <- sum(allres[,"sum"])/sum(allres[,"n"]) # mean
+
+##########
+
 ```
 
 2. Write a function that takes a vector and `my_mean` as input 
 and returns (i) the sum of squared deviations between the vector's values
 and `my_mean` and (ii) the number of vector values (n). 
 
+```{r}
+ff <- function(vec,my_mean){
+  m <- sum( (vec - my_mean )^2 )
+  n <- as.double(length(vec))
+  data.frame(m,n)
+}
+vec <- c(1,2,3,4)
+a <- ff(vec,my_mean)
+```
 3. Use `lapply()` to call your function from (2) on each element of 
 `dat2`. 
-
+```{r}
+s <- lapply(dat2,ff,my_mean=my_mean)
+```
 
 4. Use `simple_reduce()` to combine your results into a single data frame, 
 and calculate the sample variance from this data frame. Compare 
-your answer to `var(unlist(dat2))`.
+your answer to `var(unlist(dat2))`. different result
 
+```{r}
+reduce <- NULL
+reduce <- simple_reduce(s,rbind)
+var(reduce)
+var(unlist(dat2))
+View(unlist(dat2))
+```
 ## Recursive partitioning
 
 * The following code chunk is the start of an implementation

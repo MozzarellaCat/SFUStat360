@@ -32,6 +32,8 @@ simdat <- function(n) {
   y <- beta * x + rnorm(n)
   data.frame(x=x,y=y)
 }
+######3
+dd <- simdat(1000)
 ```
 
 
@@ -53,13 +55,38 @@ system.time({
 ```
 Use the first element of the output (`user` time) as 
 your measure of execution time.
-
+```{r}
+# bigd1 <- NULL
+# for(i in 1:500){
+#   bigd1 <- rbind(bigd1,simdat(1000))
+# }
+#time the code:
+system.time({
+  bigd1 <- NULL
+  for(i in 1:500){
+    bigd1 <- rbind(bigd1,simdat(1000))
+  } # Could put multiple lines of R code here
+})
+```
 3. Repeat 2, but this time, instead of stacking
 the output of `simdat()`, coerce the output
 of `simdat()` to a matrix, and stack the 
 matrices. Use `system.time()` to time your code
 and compare the timing from question (2).
-
+############
+Faster than 2
+```{r}
+system.time({
+  bigd1 <- NULL
+  for(i in 1:500){
+    if(i!=1){
+    bigd1 <- rbind(bigd1,as.matrix(simdat(1000)))
+    }else{
+      bigd1 <- as.matrix(simdat(1000))
+    }
+  }
+})
+```
 4. Now build `bigd2` by (i) initializing an empty
 matrix of appropriate dimension, and (ii) looping 500 times
 and inserting simulated datasets of size $n=1000$, coerced to matrices, into successive layers of `bigd2`.
@@ -73,6 +100,17 @@ layerInds <- function(layerNum,nrow) {
 # Example use:
 inds <- layerInds(layer=1,nrow=1000)
 range(inds)
+
+########################
+system.time({
+bigd2 <- matrix(data=1:1000000,nrow=500000,ncol=2,
+                dimnames = list(c(1:500000),
+                                c("x", "y")))
+
+for(i in 1:500){
+  bigd2[range(layerInds(i,1000))[1]:range(layerInds(i,1000))[2],]<- as.matrix(simdat(1000))
+}
+})
 ```
 
 
@@ -81,9 +119,9 @@ range(inds)
 1. What type of vector does each of the following return?
 
 ```{r}
-ifelse(TRUE, 1, "no")
-ifelse(FALSE, 1, "no")
-ifelse(NA, 1, "no")
+ifelse(TRUE, 1, "no") #double
+ifelse(FALSE, 1, "no") #character
+ifelse(NA, 1, "no") #logical
 ```
 
 2. Re-write the following using `switch`
@@ -99,6 +137,14 @@ cc <- function(x,method) {
     IQR_mid(x)
   } else stop("centring method ",method," not implemented")
 }
+########
+cc <- function(x,method){
+  switch(method,mean=mean(x),
+         median=median(x),
+         IQR_mid=IQR_mid(x),
+         stop("centring method ",method," not implemented"))
+}
+#########
 set.seed(123)
 x <- c(-3,rnorm(100),1000)
 cc(x,"mean")
@@ -124,6 +170,16 @@ rtruncNormal <- function(thresh = 2, maxit=1000) {
   }
   x
 }
+########
+rtruncNormal <- function(thresh = 2){
+  x <- NULL
+  xnew <- rnorm(n=1)
+  while(xnew<thresh){
+    x <- c(x,xnew)
+    xnew <- rnorm(n=1)
+  }
+  x
+}
 set.seed(1234)
 rtruncNormal()
 ```
@@ -134,10 +190,10 @@ rtruncNormal()
 4. The following code chunk is typed into the R Console.
     - What is the output of the function call `f(5)`?
     - What is the enclosing environment of `f()`?
-    - What is the enclosing environment of `g()`?
+    - What is the enclosing environment of `g()`? #f
     - What search order does R use to find the 
-    value of `x` when it is needed in `g()`?
-```
+    value of `x` when it is needed in `g()`? inside g->f->global
+```{r}
 x <- 1
 f <- function(y) {
   g <- function(z) {
@@ -145,7 +201,9 @@ f <- function(y) {
   }
   g(y)
 }
-f(5)
+f(5) #36
+environment(f)#<environment: R_GlobalEnv>
+
 ```
 
 

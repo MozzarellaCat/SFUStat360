@@ -1,4 +1,4 @@
----
+  ---
 title: 'Statistics 360:  Advanced R for Data Science'
 subtitle: 'Lecture 1'
 author: "Brad McNeney"
